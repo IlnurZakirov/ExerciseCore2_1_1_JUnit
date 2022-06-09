@@ -15,7 +15,7 @@ public abstract class Account implements AddMoney, Transfer {
     @Override
     public boolean addMoney(double amount) {
         if (amount < 0) {
-            System.out.println("Нельзя пополнить счет отрицательной суммой");
+            System.out.println("Нельзя пополнить счет отрицательным числом");
             return false;
         } else {
             setBalance(getBalance().add(BigDecimal.valueOf(amount)));
