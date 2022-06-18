@@ -1,5 +1,6 @@
 package accounts;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -16,11 +17,17 @@ class CheckingAccountTest {
     double payment = 2;
     double bigPayment = 4;
     double negativePayment = -2;
-    CheckingAccount checkingAccount = new CheckingAccount(balance);
-    SavingsAccount savingsAccount = new SavingsAccount(balance);
+    CheckingAccount checkingAccount;
+    SavingsAccount savingsAccount;
+
+    @BeforeEach
+    public void initEach() {
+        checkingAccount = new CheckingAccount(balance);
+        savingsAccount = new SavingsAccount(balance);
+    }
 
     @Test
-    void classTest() {
+    void classCheckingAccountTest() {
         assertThat(checkingAccount, isA(Account.class));
         assertThat(savingsAccount, isA(Account.class));
         assertThat(checkingAccount, notNullValue());
@@ -33,36 +40,52 @@ class CheckingAccountTest {
 
     @Test
     void addMoney() {
-        checkingAccount.addMoney(negativePayment);
-        assertThat(BigDecimal.valueOf(balance), equalTo(checkingAccount.getBalance()));
-
         checkingAccount.addMoney(payment);
         assertThat(BigDecimal.valueOf(balance + payment), equalTo(checkingAccount.getBalance()));
     }
 
     @Test
+    void addMoneyForNegativePayment() {
+        checkingAccount.addMoney(negativePayment);
+        assertThat(BigDecimal.valueOf(balance), equalTo(checkingAccount.getBalance()));
+    }
+
+    @Test
     void pay() {
-        checkingAccount.pay(bigPayment);
-        assertThat(BigDecimal.valueOf(balance), equalTo(checkingAccount.getBalance()));
-
-        checkingAccount.pay(negativePayment);
-        assertThat(BigDecimal.valueOf(balance), equalTo(checkingAccount.getBalance()));
-
         checkingAccount.pay(payment);
         assertThat(BigDecimal.valueOf(balance - payment), equalTo(checkingAccount.getBalance()));
     }
 
     @Test
+    void payOnInsufficientFounds() {
+        checkingAccount.pay(bigPayment);
+        assertThat(BigDecimal.valueOf(balance), equalTo(checkingAccount.getBalance()));
+    }
+
+    @Test
+    void payForNegativePayment() {
+        checkingAccount.pay(negativePayment);
+        assertThat(BigDecimal.valueOf(balance), equalTo(checkingAccount.getBalance()));
+    }
+
+    @Test
     void transfer() {
-        checkingAccount.transfer(savingsAccount, bigPayment);
-        assertThat(BigDecimal.valueOf(balance), equalTo(checkingAccount.getBalance()));
-        assertThat(BigDecimal.valueOf(balance), equalTo(savingsAccount.getBalance()));
-
-        checkingAccount.transfer(savingsAccount, negativePayment);
-        assertThat(BigDecimal.valueOf(balance), equalTo(checkingAccount.getBalance()));
-
         checkingAccount.transfer(savingsAccount, payment);
         assertThat(BigDecimal.valueOf(balance - payment), equalTo(checkingAccount.getBalance()));
         assertThat(BigDecimal.valueOf(balance + balance), equalTo(savingsAccount.getBalance()));
     }
+
+    @Test
+    void transferOnInsufficientFounds() {
+        checkingAccount.transfer(savingsAccount, bigPayment);
+        assertThat(BigDecimal.valueOf(balance), equalTo(checkingAccount.getBalance()));
+        assertThat(BigDecimal.valueOf(balance), equalTo(savingsAccount.getBalance()));
+    }
+
+    @Test
+    void transferForNegativePayment() {
+        checkingAccount.transfer(savingsAccount, negativePayment);
+        assertThat(BigDecimal.valueOf(balance), equalTo(checkingAccount.getBalance()));
+    }
+
 }
